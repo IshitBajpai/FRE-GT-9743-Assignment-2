@@ -166,5 +166,20 @@ class OptionStrategy:
 
 ### Option Strategy Registry
 class OptionStrategyRegistry(Registry):
+    def __new__(cls):
+        return super().__new__(cls,"OPTION_STRATEGIES","strategies.yaml")
 
-### TODO
+    def register(self, strat_name: str, strat_content):
+        if not super().register(strat_name, strat_content):
+            return
+        
+        if isinstance(strat_content, dict):
+            self._instance._registry[strat_name] = OptionStrategy.createFromDict(strat_name, strat_content)
+
+        elif isinstance(strat_content, list):
+            self._instance._registry[strat_name] = OptionStrategy.createFromList(strat_name, strat_content)
+
+        else:
+            logger.warning(
+                f"Invalid strategy content format: {type(strat_content)}.")
+    # rest of the methods are implemented in the parent class
